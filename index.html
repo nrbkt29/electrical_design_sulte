@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Electrical Design Suite v2.1 | มาตรฐาน วสท. 2564</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <h1>⚡ Electrical Design <span>Suite v2.1</span></h1>
+      <p>คำนวณสายไฟ • กระแสลัดวงจร • Load Schedule • รายงาน A4 — อ้างอิง วสท. 2564 (022001-22) & IEC 60909</p>
+    </header>
+
+    <div class="tabs">
+      <button class="tab on" data-p="p1">⚡ ขนาดสายไฟ</button>
+      <button class="tab" data-p="p2">🔥 กระแสลัดวงจร (Isc)</button>
+      <button class="tab" data-p="p3">📋 Load Schedule</button>
+      <button class="tab" data-p="p4">📚 ตารางอ้างอิง</button>
+      <button class="tab" data-p="p5">🖨️ ออกรายงาน A4</button>
+    </div>
+
+    <!-- ═══════ PANE 1 : WIRE ═══════ -->
+    <div class="pane on" id="p1">
+      <div class="grid">
+        <div class="card">
+          <h2>📥 ข้อมูลนำเข้า</h2>
+          <div class="field"><label>ระบบไฟฟ้า</label>
+            <select id="sys">
+              <option value="1|230">1 เฟส 2 สาย 230 V</option>
+              <option value="3|400" selected>3 เฟส 4 สาย 400/230 V</option>
+              <option value="1|220">1 เฟส 220 V</option>
+              <option value="3|380">3 เฟส 380 V</option>
+            </select>
+          </div>
+          <div class="row">
+            <div class="field"><label>ระบุโหลดเป็น</label><select id="mode">
+                <option value="kw">กำลังไฟฟ้า (kW)</option>
+                <option value="kva">กำลังปรากฏ (kVA)</option>
+                <option value="a">กระแส (A)</option>
+              </select></div>
+            <div class="field"><label id="loadLbl">กำลังไฟฟ้า (kW)</label>
+              <input type="number" id="load" value="15" step="0.01">
+            </div>
+          </div>
+          <div class="row">
+            <div class="field"><label>ตัวประกอบกำลัง (PF)</label><input type="number" id="pf" value="0.85" step="0.01">
+            </div>
+            <div class="field"><label>Demand Factor</label><input type="number" id="df" value="1" step="0.05"></div>
+          </div>
+          <h3 class="sec">▸ ลักษณะการติดตั้ง</h3>
+          <div class="row">
+            <div class="field"><label>ชนิดฉนวน</label><select id="ins">
+                <option value="pvc">PVC 70°C (THW/NYY/VAF)</option>
+                <option value="xlpe">XLPE 90°C (CV)</option>
+              </select></div>
+            <div class="field"><label>ตัวนำ</label><select id="cond">
+                <option value="cu">ทองแดง (Copper)</option>
+                <option value="al">อะลูมิเนียม (×0.78)</option>
+              </select></div>
+          </div>
+          <div class="field"><label>กลุ่มการติดตั้ง (ตาราง 5-20)</label><select id="grp">
+              <option value="1">กลุ่ม 1 — แกนเดียว เดินในอากาศ</option>
+              <option value="2">กลุ่ม 2 — สายแบน/หลายแกน เกาะผนัง</option>
+              <option value="3" selected>กลุ่ม 3 — แกนเดียว ร้อยท่อ ในอากาศ/ฝังผนัง</option>
+              <option value="4">กลุ่ม 4 — หลายแกน ร้อยท่อ ในอากาศ/ฝังผนัง</option>
+              <option value="5">กลุ่ม 5 — ร้อยท่อฝังดิน</option>
+              <option value="6">กลุ่ม 6 — ฝังดินโดยตรง</option>
+              <option value="7">กลุ่ม 7 — วางบนรางเคเบิลระบายอากาศ</option>
+            </select></div>
+          <div class="row">
+            <div class="field"><label id="tLbl">อุณหภูมิโดยรอบ (°C)</label><select id="temp"></select></div>
+            <div class="field"><label>จำนวนวงจรร่วมท่อ/ราง</label><select id="grpN">
+                <option value="1">1 วงจร</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7-8</option>
+                <option value="9">9-12</option>
+                <option value="13">13-15</option>
+                <option value="16">16-20</option>
+              </select></div>
+          </div>
+          <h3 class="sec">▸ แรงดันตก</h3>
+          <div class="row">
+            <div class="field"><label>ความยาวสาย (m)</label><input type="number" id="len" value="40"></div>
+            <div class="field"><label>%VD ที่ยอมให้</label><select id="vdmax">
+                <option value="3" selected>3% (วสท.)</option>
+                <option value="2">2%</option>
+                <option value="5">5% รวมระบบ</option>
+              </select></div>
+          </div>
+          <div class="chk"><input type="checkbox" id="cont" checked><label for="cont">โหลดต่อเนื่อง — คิด 125%</label>
+          </div>
+          <div class="chk"><input type="checkbox" id="par"><label for="par">อนุญาตสายควบ (Parallel)</label></div>
+          <button onclick="calc()">🧮 คำนวณขนาดสายไฟ</button>
+          <button class="btn2" onclick="goPrint()">🖨️ ออกรายงาน A4 / PDF</button>
+        </div>
+        <div class="card">
+          <h2>📤 ผลการคำนวณ</h2>
+          <div id="out"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>📊 ตารางเปรียบเทียบทุกขนาด</h2>
+        <div class="scroll" id="tbl"></div>
+      </div>
+    </div>
+
+    <!-- ═══════ PANE 2 : SHORT CIRCUIT ═══════ -->
+    <div class="pane" id="p2">
+      <div class="grid">
+        <div class="card">
+          <h2>🔥 พารามิเตอร์แหล่งจ่าย</h2>
+          <div class="field"><label>ชนิดแหล่งจ่าย</label><select id="scSrc">
+              <option value="tx" selected>หม้อแปลงจำหน่าย (Distribution Transformer)</option>
+              <option value="grid">จุดต่อ MDB / ทราบค่า Isc ต้นทาง</option>
+            </select></div>
+          <div id="txBox">
+            <div class="row">
+              <div class="field"><label>ขนาดหม้อแปลง (kVA)</label><select id="txS">
+                  <option>50</option>
+                  <option>100</option>
+                  <option>160</option>
+                  <option>250</option>
+                  <option selected>315</option>
+                  <option>400</option>
+                  <option>500</option>
+                  <option>630</option>
+                  <option>800</option>
+                  <option>1000</option>
+                  <option>1250</option>
+                  <option>1500</option>
+                  <option>2000</option>
+                  <option>2500</option>
+                </select></div>
+              <div class="field"><label>%Impedance (Uk%)</label><input type="number" id="txZ" value="4" step="0.1">
+              </div>
+            </div>
+            <div class="row">
+              <div class="field"><label>แรงดันด้านทุติยภูมิ (V)</label><select id="txV">
+                  <option value="400" selected>400 V (3φ)</option>
+                  <option value="416">416 V</option>
+                  <option value="230">230 V (1φ)</option>
+                </select></div>
+              <div class="field"><label>Fault Level ระบบ HV (MVA)</label><select id="hvM">
+                  <option value="0">ไม่คิด (Infinite Bus)</option>
+                  <option value="500">500 MVA</option>
+                  <option value="350" selected>350 MVA (ทั่วไป กฟภ./กฟน.)</option>
+                  <option value="250">250 MVA</option>
+                  <option value="150">150 MVA</option>
+                </select></div>
+            </div>
+          </div>
+          <div id="gridBox" style="display:none">
+            <div class="row">
+              <div class="field"><label>Isc ที่จุดต้นทาง (kA)</label><input type="number" id="gI" value="25" step="0.1">
+              </div>
+              <div class="field"><label>แรงดันระบบ (V)</label><input type="number" id="gV" value="400"></div>
+            </div>
+          </div>
+          <h3 class="sec">▸ สายเคเบิลจากแหล่งจ่ายถึงจุดที่พิจารณา</h3>
+          <div class="row3">
+            <div class="field"><label>ขนาดสาย (mm²)</label><select id="scSz"></select></div>
+            <div class="field"><label>ความยาว (m)</label><input type="number" id="scL" value="30"></div>
+            <div class="field"><label>จำนวนเส้นควบ/เฟส</label><select id="scN">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+              </select></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>ฉนวน (สำหรับค่า k)</label><select id="scIns">
+                <option value="115">PVC + ทองแดง (k=115)</option>
+                <option value="143">XLPE + ทองแดง (k=143)</option>
+                <option value="76">PVC + อะลูมิเนียม (k=76)</option>
+                <option value="94">XLPE + อะลูมิเนียม (k=94)</option>
+              </select></div>
+            <div class="field"><label>เวลาตัดวงจรของ CB (วินาที)</label><select id="scT">
+                <option value="0.01">0.01 s — Current Limiting</option>
+                <option value="0.1" selected>0.1 s — MCCB ทั่วไป</option>
+                <option value="0.2">0.2 s</option>
+                <option value="0.5">0.5 s</option>
+                <option value="1">1.0 s — ACB มี Short-time delay</option>
+              </select></div>
+          </div>
+          <button onclick="calcSC()">🔥 คำนวณกระแสลัดวงจร</button>
+        </div>
+        <div class="card">
+          <h2>📤 ผลการคำนวณ Isc</h2>
+          <div id="scOut"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>📉 Isc ตามระยะทางสาย (Attenuation Curve)</h2>
+        <div class="scroll" id="scTbl"></div>
+      </div>
+    </div>
+
+    <!-- ═══════ PANE 3 : LOAD SCHEDULE ═══════ -->
+    <div class="pane" id="p3">
+      <div class="card">
+        <h2>⚙️ ตั้งค่าตู้โหลดเซ็นเตอร์</h2>
+        <div class="row3">
+          <div class="field"><label>ชื่อตู้ (Panel ID)</label><input type="text" id="pnName" value="DB-1"></div>
+          <div class="field"><label>ระบบไฟฟ้า</label><select id="pnSys">
+              <option value="3|400" selected>3 เฟส 4 สาย 400/230 V</option>
+              <option value="1|230">1 เฟส 2 สาย 230 V</option>
+            </select></div>
+          <div class="field"><label>กลุ่มติดตั้ง (วงจรย่อย)</label><select id="pnGrp">
+              <option value="3" selected>กลุ่ม 3 — ร้อยท่อ</option>
+              <option value="1">กลุ่ม 1 — ในอากาศ</option>
+              <option value="2">กลุ่ม 2 — เกาะผนัง</option>
+              <option value="4">กลุ่ม 4 — หลายแกนร้อยท่อ</option>
+              <option value="7">กลุ่ม 7 — Cable Tray</option>
+            </select></div>
+        </div>
+        <div class="row3">
+          <div class="field"><label>อุณหภูมิอากาศ (°C)</label><select id="pnT">
+              <option value="1.15">30 °C (×1.15)</option>
+              <option value="1.08">35 °C (×1.08)</option>
+              <option value="1" selected>40 °C (×1.00)</option>
+              <option value="0.91">45 °C (×0.91)</option>
+            </select></div>
+          <div class="field"><label>Demand Factor รวม (สายป้อน)</label><input type="number" id="pnDF" value="0.8"
+              step="0.05"></div>
+          <div class="field"><label>ความยาวสายป้อน (m)</label><input type="number" id="pnFL" value="50"></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <button class="btnS" onclick="addRow()">➕ เพิ่มวงจร</button>
+          <button class="btnS btn2" onclick="autoBalance()">⚖️ จัดสมดุลเฟสอัตโนมัติ</button>
+          <button class="btnS btn3" onclick="calcLS()">🧮 คำนวณทั้งตู้</button>
+          <button class="btnS btn2" onclick="exportCSV()">📄 Export CSV</button>
+          <button class="btnS btn2" onclick="loadDemo()">📦 โหลดตัวอย่าง</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>📋 รายการวงจรย่อย</h2>
+        <div class="scroll" style="max-height:none">
+          <table class="ls-tbl">
+            <thead>
+              <tr>
+                <th>CKT</th>
+                <th>ชื่อวงจร</th>
+                <th>ชนิดโหลด</th>
+                <th>เฟส</th>
+                <th>โหลด<br>(W)</th>
+                <th>PF</th>
+                <th>ยาว<br>(m)</th>
+                <th>ต่อเนื่อง</th>
+                <th>I<sub>L</sub><br>(A)</th>
+                <th>CB<br>(A)</th>
+                <th>สาย<br>(mm²)</th>
+                <th>G<br>(mm²)</th>
+                <th>%VD</th>
+                <th>ท่อ</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="lsBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <h2>⚖️ สมดุลเฟส (Phase Balance)</h2>
+          <div id="balOut"></div>
+        </div>
+        <div class="card">
+          <h2>🔌 สรุปเมนและสายป้อน</h2>
+          <div id="mainOut"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ PANE 4 : REF ═══════ -->
+    <div class="pane" id="p4">
+      <div class="card">
+        <h2>📚 ตารางพิกัดกระแส — สายทองแดง PVC 70°C (วสท. ตาราง 5-20)</h2>
+        <div class="scroll" id="refA"></div>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <h2>🌡️ ตัวคูณอุณหภูมิ (ตาราง 5-24/5-25)</h2>
+          <div id="refT"></div>
+        </div>
+        <div class="card">
+          <h2>🔢 ตัวคูณจำนวนวงจร (ตาราง 5-27)</h2>
+          <div id="refG"></div>
+        </div>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <h2>🌍 สายดินบริภัณฑ์ (ตาราง 4-1)</h2>
+          <div id="refE"></div>
+        </div>
+        <div class="card">
+          <h2>⚓ สายต่อหลักดิน (ตาราง 4-2)</h2>
+          <div id="refGE"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>🔧 ค่าคงที่ตัวนำ R, X และขนาดท่อ (Fill 40%)</h2>
+        <div class="scroll" id="refR"></div>
+      </div>
+    </div>
+
+    <!-- ═══════ PANE 5 : PRINT ═══════ -->
+    <div class="pane" id="p5">
+      <div class="card">
+        <h2>🖨️ ตั้งค่ารายงาน A4</h2>
+        <div class="row3">
+          <div class="field"><label>ชื่อโครงการ</label><input type="text" id="rProj"
+              value="โครงการอาคารพักอาศัย 2 ชั้น"></div>
+          <div class="field"><label>สถานที่ / ที่ตั้ง</label><input type="text" id="rLoc" value="กรุงเทพมหานคร"></div>
+          <div class="field"><label>เลขที่เอกสาร</label><input type="text" id="rDoc" value="EE-CALC-001"></div>
+        </div>
+        <div class="row3">
+          <div class="field"><label>ผู้คำนวณ</label><input type="text" id="rBy" value=""></div>
+          <div class="field"><label>ผู้ตรวจสอบ / วิศวกร (กว.)</label><input type="text" id="rChk" value=""></div>
+          <div class="field"><label>เลขทะเบียน กว.</label><input type="text" id="rLic" value=""></div>
+        </div>
+        <h3 class="sec">▸ เลือกหมวดที่ต้องการพิมพ์</h3>
+        <div style="display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 10px">
+          <div class="chk"><input type="checkbox" id="s1" checked><label for="s1">หมวด 1 — ขนาดสายไฟ</label></div>
+          <div class="chk"><input type="checkbox" id="s2" checked><label for="s2">หมวด 2 — กระแสลัดวงจร</label></div>
+          <div class="chk"><input type="checkbox" id="s3" checked><label for="s3">หมวด 3 — Load Schedule</label></div>
+          <div class="chk"><input type="checkbox" id="s4"><label for="s4">ภาคผนวก — ตารางอ้างอิง</label></div>
+          <div class="chk"><input type="checkbox" id="sSig" checked><label for="sSig">หน้าลงนามรับรอง</label></div>
+        </div>
+        <button class="btn3" onclick="printReport()">📄 สร้างรายงาน & พิมพ์ / บันทึก PDF</button>
+        <div class="note"><b>💡 ตั้งค่าตอนพิมพ์ (Chrome / Edge):</b><br>
+          • ปลายทาง: <b>บันทึกเป็น PDF</b> &nbsp;• ขนาดกระดาษ: <b>A4</b> &nbsp;• ระยะขอบ: <b>ค่าเริ่มต้น</b><br>
+          • ✅ ติ๊ก <b>กราฟิกพื้นหลัง (Background graphics)</b> — สำคัญมาก ไม่งั้นสีหัวตารางจะหาย<br>
+          • ❌ ปิด <b>หัวกระดาษและท้ายกระดาษ</b> ของเบราว์เซอร์</div>
+      </div>
+    </div>
+
+    <div class="note">
+      <b>⚠️ ข้อจำกัดความรับผิดชอบ:</b> เครื่องมือนี้ใช้ประมาณการเบื้องต้น ค่าพิกัดกระแสอ้างอิงตาราง วสท. 2564
+      การคำนวณ Isc ใช้วิธี Impedance Method ตาม IEC 60909 (แบบย่อ) ผลลัพธ์ต้องได้รับการตรวจสอบและรับรอง
+      โดย<b>วิศวกรไฟฟ้าผู้ได้รับใบอนุญาต (กว.)</b> ก่อนนำไปติดตั้งจริงเสมอ
+    </div>
+  </div>
+
+  <div id="report"></div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
